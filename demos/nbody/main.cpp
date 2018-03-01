@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- *  Copyright (C) 2017 Codeplay Software Limited
+ *  Copyright (C) 2018 Codeplay Software Limited
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -40,7 +40,6 @@
 #include <codeplay_demo.hpp>
 
 #include "sim.hpp"
-
 
 using num_t = float;
 constexpr num_t PI = num_t(3.141592653589793238462643383279502884197169399);

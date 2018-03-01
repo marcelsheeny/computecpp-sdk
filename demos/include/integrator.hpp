@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- *  Copyright (C) 2017 Codeplay Software Limited
+ *  Copyright (C) 2018 Codeplay Software Limited
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -28,7 +28,6 @@
 #pragma once
 
 #include "tuple_utils.hpp"
-
 
 /* Given a function `func` expressing a derivative of order N, a time step size
  * `step`,
@@ -99,7 +98,7 @@ std::tuple<Args...> integrate_step_rk4(func_t func, time_t step, Args... vals) {
 template <typename time_t, typename func_t, typename... Args>
 std::tuple<Args...> integrate_step_euler(func_t func, time_t step, Args... vals
                                          // TODO kmem ptr for temporary storage
-                                         ) {
+) {
   static_assert(sizeof...(Args) >= 2,
                 "Do you want infinite loops in your compiler? Because this is "
                 "how you get infinite loops in your compiler.");
