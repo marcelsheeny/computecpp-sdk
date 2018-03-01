@@ -34,7 +34,6 @@ namespace sycl = cl::sycl;
 
 #include <double_buf.hpp>
 
-
 enum class CellState : cl::sycl::cl_uint {
   LIVE = 1,
   DEAD = 0,
@@ -51,9 +50,9 @@ struct GameGrid {
 
   GameGrid(size_t width, size_t height)
       : cells(sycl::range<2>(width, height)),
-        vels(sycl::range<2>(width, height))
+        vels(sycl::range<2>(width, height)),
+
         // image is flipped since OpenGL expects column-major order
-        ,
         img(sycl::range<2>(height, width)) {}
 };
 
