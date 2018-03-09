@@ -12,4 +12,6 @@ ci_make_app(
   LIBRARIES cinder_imgui
   CINDER_PATH "${CINDER_PATH}")
 
+add_definitions(-DDOUBLE_PRECISION=${DOUBLE_PRECISION})
+
 __build_spir("NBody" "${CMAKE_CURRENT_SOURCE_DIR}/sim.cpp" "${CMAKE_CURRENT_BINARY_DIR}" 1)

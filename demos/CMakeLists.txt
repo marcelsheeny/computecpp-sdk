@@ -29,6 +29,8 @@ set(CIGUI_SOURCES
 add_library(cinder_imgui "${CIGUI_SOURCES}")
 target_link_libraries(cinder_imgui cinder)
 
+add_definitions(-DDOUBLE_PRECISION=${DOUBLE_PRECISION})
+
 add_subdirectory(game_of_life)
 add_subdirectory(mandelbrot)
 add_subdirectory(nbody)
