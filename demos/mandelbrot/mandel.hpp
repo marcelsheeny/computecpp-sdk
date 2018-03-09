@@ -93,10 +93,10 @@ class MandelbrotCalculator {
       // Anything above this number is assumed divergent. To do less
       // computation, this is the _square_ of the maximum absolute value
       // of a non-divergent number
-      constexpr num_t DIVERGENCE_LIMIT = num_t(256);
+      constexpr num_t DIVERGENCE_LIMIT = (num_t)(256);
       // Calculates how many iterations does it take to diverge? MAX_ITERS if in
       // Mandelbrot set
-      const auto how_mandel = [](num_t re, num_t im) -> num_t {
+      auto how_mandel = [](num_t re, num_t im) -> num_t {
         num_t z_re = 0;
         num_t z_im = 0;
         num_t abs_sq = 0;
@@ -124,12 +124,10 @@ class MandelbrotCalculator {
       size_t width = m_width;
       size_t height = m_height;
 
-      num_t minx = m_x.first;
-      num_t maxx = m_x.second;
-      num_t miny = m_y.first;
-      num_t maxy = m_y.second;
+      std::pair<num_t, num_t> xx = std::make_pair(m_x.first, m_x.second);
+      std::pair<num_t, num_t> yy = std::make_pair(m_y.first, m_y.second);
 
-      // Use the MandelbrotCalculator class for unique kernel name typ
+      // Use the MandelbrotCalculator class for unique kernel name type
       cgh.parallel_for<decltype(this)>(
           sycl::range<2>(m_height, m_width), [=](sycl::item<2> item) {
             // Obtain normalized coords [0, 1]
@@ -137,11 +135,11 @@ class MandelbrotCalculator {
             num_t y = num_t(item.get(0)) / num_t(height);
 
             // Put them within desired bounds
-            x *= (maxx - minx);
-            x += minx;
+            x *= (xx.second - xx.first);
+            x += xx.first;
 
-            y *= (maxy - miny);
-            y += miny;
+            y *= (yy.second - yy.first);
+            y += yy.first;
 
             // Calculate sequence divergence
             num_t mandelness = how_mandel(x, y);
