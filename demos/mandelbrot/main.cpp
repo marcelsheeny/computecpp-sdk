@@ -38,9 +38,11 @@ namespace sycl = cl::sycl;
 
 #include "mandel.hpp"
 
-constexpr size_t WIDTH = 800;
-constexpr size_t HEIGHT = 600;
+// Size of the Window
+constexpr size_t WIDTH = 800u;
+constexpr size_t HEIGHT = 600u;
 
+// Macro that defines the use of double precision or not
 #ifdef DOUBLE_PRECISION
 using Type = double;
 #else

@@ -45,10 +45,8 @@ class MandelbrotCalculator {
   sycl::buffer<sycl::cl_uchar4, 2> m_img;
 
   // Boundaries on the part of the complex plane which we want to view
-  num_t m_minx = -2;
-  num_t m_maxx = 1;
-  num_t m_miny = -1;
-  num_t m_maxy = 1;
+  std::pair<num_t, num_t> m_x = std::make_pair(-2, 1);
+  std::pair<num_t, num_t> m_y = std::make_pair(-1, 1);
 
  public:
   MandelbrotCalculator(size_t width, size_t height)
@@ -71,10 +69,8 @@ class MandelbrotCalculator {
 
   // Set the boundaries of the viewable region. X is Re, Y is Im.
   void set_bounds(num_t min_x, num_t max_x, num_t min_y, num_t max_y) {
-    m_minx = min_x;
-    m_maxx = max_x;
-    m_miny = min_y;
-    m_maxy = max_y;
+    m_x = std::make_pair(min_x, max_x);
+    m_y = std::make_pair(min_y, max_y);
   }
 
   void calc();
@@ -127,10 +123,11 @@ class MandelbrotCalculator {
       // Dummy variable copies to avoid capturing `this` in kernel lambda
       size_t width = m_width;
       size_t height = m_height;
-      num_t minx = m_minx;
-      num_t maxx = m_maxx;
-      num_t miny = m_miny;
-      num_t maxy = m_maxy;
+
+      num_t minx = m_x.first;
+      num_t maxx = m_x.second;
+      num_t miny = m_y.first;
+      num_t maxy = m_y.second;
 
       // Use the MandelbrotCalculator class for unique kernel name typ
       cgh.parallel_for<decltype(this)>(
