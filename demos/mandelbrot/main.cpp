@@ -36,20 +36,12 @@
 #include <CL/sycl.hpp>
 namespace sycl = cl::sycl;
 
-#include <codeplay_demo.hpp>
-
 #include "mandel.hpp"
 
 constexpr size_t WIDTH = 800;
 constexpr size_t HEIGHT = 600;
 
-class MandelbrotApp
-#ifdef CODEPLAY_DRAW_LOGO
-    : public CodeplayDemoApp
-#else
-    : public ci::app::App
-#endif
-{
+class MandelbrotApp : public ci::app::App {
   // Use doubles for more zoom
   MandelbrotCalculator<double> m_calc;
 
@@ -103,10 +95,6 @@ class MandelbrotApp
 
     ci::Rectf screen(0, 0, getWindow()->getWidth(), getWindow()->getHeight());
     ci::gl::draw(m_tex, screen);
-
-#ifdef CODEPLAY_DRAW_LOGO
-    draw_codeplay_logo();
-#endif
   }
 
   void mouseWheel(ci::app::MouseEvent event) override {

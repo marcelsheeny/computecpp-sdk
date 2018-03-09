@@ -155,45 +155,41 @@ class GameOfLifeSim {
             size_t x = item.get(0);
             size_t y = item.get(1);
 
-            // Unrolled loop for accessing the 3x3 stencil
-            bool live_a = r[sycl::id<2>((x - 1) % width, (y + 1) % height)] ==
-                          CellState::LIVE;
-            bool live_b = r[sycl::id<2>((x + 0) % width, (y + 1) % height)] ==
-                          CellState::LIVE;
-            bool live_c = r[sycl::id<2>((x + 1) % width, (y + 1) % height)] ==
-                          CellState::LIVE;
-            bool live_d = r[sycl::id<2>((x - 1) % width, (y + 0) % height)] ==
-                          CellState::LIVE;
-            bool live_e = r[sycl::id<2>((x + 1) % width, (y + 0) % height)] ==
-                          CellState::LIVE;
-            bool live_f = r[sycl::id<2>((x - 1) % width, (y - 1) % height)] ==
-                          CellState::LIVE;
-            bool live_g = r[sycl::id<2>((x + 0) % width, (y - 1) % height)] ==
-                          CellState::LIVE;
-            bool live_h = r[sycl::id<2>((x + 1) % width, (y - 1) % height)] ==
-                          CellState::LIVE;
+            // function that process index
+            auto process_index = [](int ind, int offset, int max_size) {
+              return (ind + offset) % max_size;
+            };
 
-            // Sets the "velocity" of a cell depending on which neighbour cells
-            // are alive
-            auto vel_a = sycl::float2(-0.7f, 0.7f) * live_a;
-            auto vel_b = sycl::float2(0.0f, 1.0f) * live_b;
-            auto vel_c = sycl::float2(0.7f, 0.7f) * live_c;
-            auto vel_d = sycl::float2(-1.0f, 0.0f) * live_d;
-            auto vel_e = sycl::float2(1.0f, 0.0f) * live_e;
-            auto vel_f = sycl::float2(-0.7f, -0.7f) * live_f;
-            auto vel_g = sycl::float2(0.0f, -1.0f) * live_g;
-            auto vel_h = sycl::float2(0.7f, -0.7f) * live_h;
+            bool live[8];
+            int count = 0;
+            for (int offset_j = 1; offset_j >= -1; offset_j--) {
+              for (int offset_i = -1; offset_i <= 1; offset_i++) {
+                if (offset_j != 0 || offset_i != 0) {
+                  int x_ind = process_index(x, offset_i, width);
+                  int y_ind = process_index(y, offset_j, height);
+                  live[count++] =
+                      r[sycl::id<2>(x_ind, y_ind)] == CellState::LIVE;
+                }
+              }
+            }
+
+            // Sets the "velocity" of a cell depending on which neighbour
+            // cells are alive
+            auto vel = sycl::float2(-0.7f, 0.7f) * live[0];
+            vel += sycl::float2(0.0f, 1.0f) * live[1];
+            vel += sycl::float2(0.7f, 0.7f) * live[2];
+            vel += sycl::float2(-1.0f, 0.0f) * live[3];
+            vel += sycl::float2(1.0f, 0.0f) * live[4];
+            vel += sycl::float2(-0.7f, -0.7f) * live[5];
+            vel += sycl::float2(0.0f, -1.0f) * live[6];
+            vel += sycl::float2(0.7f, -0.7f) * live[7];
+            vel /= 8.0f;
 
             // Counts the alive neighbours
             size_t live_neighbours = 0;
-            live_neighbours += live_a;
-            live_neighbours += live_b;
-            live_neighbours += live_c;
-            live_neighbours += live_d;
-            live_neighbours += live_e;
-            live_neighbours += live_f;
-            live_neighbours += live_g;
-            live_neighbours += live_h;
+            for (size_t i = 0; i < 8; i++) {
+              live_neighbours += live[i];
+            }
 
             // Advances the cell state according to Conway's rules
             CellState new_state;
@@ -212,10 +208,6 @@ class GameOfLifeSim {
             }
             w[item] = new_state;
 
-            // Compute the new "velocity" as average of previous and current
-            auto vel = -(vel_a + vel_b + vel_c + vel_d + vel_e + vel_f + vel_g +
-                         vel_h) /
-                       8.0f;
             auto new_vel = (rv[item] + vel) / 2.0f;
             wv[item] = new_vel;
 
@@ -224,8 +216,8 @@ class GameOfLifeSim {
 
             // Set image pixel to new colour decided by state and "velocity"
             img[sycl::id<2>(y, x)] = sycl::cl_uchar4(
-                float(int(new_state)) * new_vel.x() * 255.0f, 0,
-                float(int(new_state)) * new_vel.y() * 255.0f, 255);
+                (float)((int)(new_state)) * new_vel.x() * 255.0f, 0,
+                (float)((int)(new_state)) * new_vel.y() * 255.0f, 255);
           });
     });
 

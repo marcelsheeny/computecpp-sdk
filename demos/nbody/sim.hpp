@@ -298,8 +298,8 @@ class GravSim {
                   vec3<num_t> acc(0);
 
                   for (size_t i = 0; i < n_bodies; i++) {
-                    auto const diff = pos[i] - x;
-                    auto const r =
+                    const auto diff = pos[i] - x;
+                    const auto r =
                         sycl::sqrt(diff.x() * diff.x() + diff.y() * diff.y() +
                                    diff.z() * diff.z()) +
                         num_t(1e24) * num_t(i == id);

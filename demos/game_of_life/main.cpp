@@ -34,17 +34,9 @@
 #include <CL/sycl.hpp>
 namespace sycl = cl::sycl;
 
-#include <codeplay_demo.hpp>
-
 #include "sim.hpp"
 
-class GameOfLifeApp
-#ifdef CODEPLAY_DRAW_LOGO
-    : public CodeplayDemoApp
-#else
-    : public ci::app::App
-#endif
-{
+class GameOfLifeApp : public ci::app::App {
   /// The window dimensions
   size_t m_width;
   size_t m_height;
@@ -123,10 +115,6 @@ class GameOfLifeApp
 
     ci::Rectf screen(0, 0, getWindow()->getWidth(), getWindow()->getHeight());
     ci::gl::draw(this->m_tex, screen);
-
-#ifdef CODEPLAY_DRAW_LOGO
-    draw_codeplay_logo();
-#endif
   }
 
   void handleMouse(size_t mouse_x, size_t mouse_y) {

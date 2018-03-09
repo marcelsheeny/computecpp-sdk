@@ -37,20 +37,12 @@
 
 #include <CL/sycl.hpp>
 
-#include <codeplay_demo.hpp>
-
 #include "sim.hpp"
 
 using num_t = float;
 constexpr num_t PI = num_t(3.141592653589793238462643383279502884197169399);
 
-class NBodyApp
-#ifdef CODEPLAY_DRAW_LOGO
-    : public CodeplayDemoApp
-#else
-    : public ci::app::App
-#endif
-{
+class NBodyApp : public ci::app::App {
   // -- GUI --
   // Distribution choice
   enum {
@@ -275,10 +267,6 @@ class NBodyApp
     ci::gl::drawVector(ci::vec3(0, 90, 0), ci::vec3(0, 100, 0), 2, 2);
     ci::gl::color(ci::Color(0.0f, 0.0f, 1.0f));
     ci::gl::drawVector(ci::vec3(0, 0, 90), ci::vec3(0, 0, 100), 2, 2);
-
-#ifdef CODEPLAY_DRAW_LOGO
-    draw_codeplay_logo();
-#endif
 
     // Draw the UI
     ui::Begin("Simulation Settings");
