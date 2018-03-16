@@ -31,6 +31,7 @@
 
 #include <CL/sycl.hpp>
 #include <sycl_utils.hpp>
+
 namespace sycl = cl::sycl;
 
 /* Computes an image representing the Mandelbrot set on the complex
