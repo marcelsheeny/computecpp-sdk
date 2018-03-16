@@ -153,14 +153,14 @@ class GameOfLifeSim {
 
             // Sets the "velocity" of a cell depending on which neighbour
             // cells are alive
-            auto vel = sycl::float2(-0.7f, 0.7f) * live[0];
-            vel += sycl::float2(0.0f, 1.0f) * live[1];
-            vel += sycl::float2(0.7f, 0.7f) * live[2];
-            vel += sycl::float2(-1.0f, 0.0f) * live[3];
-            vel += sycl::float2(1.0f, 0.0f) * live[4];
-            vel += sycl::float2(-0.7f, -0.7f) * live[5];
-            vel += sycl::float2(0.0f, -1.0f) * live[6];
-            vel += sycl::float2(0.7f, -0.7f) * live[7];
+            float vel_consts[8][2] = {
+                {-0.7f, 0.7f}, {0.0f, 1.7f},   {0.7f, 0.7f},  {-1.0f, 0.0f},
+                {1.0f, 0.0f},  {-0.7f, -0.7f}, {0.0f, -1.0f}, {0.7f, 0.7f}};
+
+            auto vel = sycl::float2(0.0f, 0.0f);
+            for (size_t i = 0; i < 8; i++) {
+              vel += sycl::float2(vel_consts[i][0], vel_consts[i][1]) * live[i];
+            }
             vel /= 8.0f;
 
             // Counts the alive neighbours
