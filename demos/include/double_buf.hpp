@@ -29,20 +29,28 @@
 
 #include <utility>
 
+enum class Buffer { USE_A, USE_B };
+
 // Double-buffers any kind of value.
 template <typename T>
 class DoubleBuf {
  public:
   template <typename... U>
   DoubleBuf(U&&... vals)
-      : m_read_a_and_not_b(true),
+      : buffer(Buffer::USE_A),
         m_a(std::forward<U>(vals)...),
         m_b(std::forward<U>(vals)...) {}
 
-  void swap() { m_read_a_and_not_b = !m_read_a_and_not_b; }
+  void swap() {
+    if (buffer == Buffer::USE_A) {
+      buffer = Buffer::USE_B;
+    } else {
+      buffer = Buffer::USE_A;
+    }
+  }
 
   T& read() {
-    if (m_read_a_and_not_b) {
+    if (buffer == Buffer::USE_A) {
       return m_a;
     } else {
       return m_b;
@@ -50,7 +58,7 @@ class DoubleBuf {
   }
 
   T& write() {
-    if (m_read_a_and_not_b) {
+    if (buffer == Buffer::USE_A) {
       return m_b;
     } else {
       return m_a;
@@ -60,9 +68,9 @@ class DoubleBuf {
  private:
   DoubleBuf() {}
 
-  // true -> read a;  false -> read b;
-  // true -> write b; false -> write a;
-  bool m_read_a_and_not_b;
+  // Buffer::USE_A -> read a;  Buffer::USE_B -> read b;
+  // Buffer::USE_A -> write b; Buffer::USE_B -> write a;
+  Buffer buffer;
   T m_a;
   T m_b;
 };
