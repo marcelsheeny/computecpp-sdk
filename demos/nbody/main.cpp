@@ -43,13 +43,15 @@ using num_t = float;
 constexpr num_t PI = num_t(3.141592653589793238462643383279502884197169399);
 
 class NBodyApp : public ci::app::App {
-  // -- GUI --
-  // Distribution choice
-  enum {
+  // Enum for cylinder and sphere cases
+  enum Distrib {
     UI_DISTRIB_CYLINDER = 0,
     UI_DISTRIB_SPHERE = 1,
   };
-  int32_t m_ui_distrib_id = UI_DISTRIB_CYLINDER;
+
+  // -- GUI --
+  // Distribution choice
+  int m_ui_distrib_id = Distrib::UI_DISTRIB_CYLINDER;
 
   // Distribution parameters
   struct {
@@ -91,11 +93,11 @@ class NBodyApp : public ci::app::App {
   } m_ui_force_lj_params;
 
   // Integrator choice
-  enum {
+  enum Integrator {
     UI_INTEGRATOR_EULER = 0,
     UI_INTEGRATOR_RK4 = 1,
   };
-  int32_t m_ui_integrator_id = UI_INTEGRATOR_EULER;
+  int m_ui_integrator_id = Integrator::UI_INTEGRATOR_EULER;
 
   // -- PROGRAM VARIABLES --
   size_t m_n_bodies = m_ui_n_bodies;
@@ -174,7 +176,7 @@ class NBodyApp : public ci::app::App {
     if (m_ui_initialize) {
       m_n_bodies = m_ui_n_bodies;
 
-      if (m_ui_distrib_id == UI_DISTRIB_CYLINDER) {
+      if (m_ui_distrib_id == Distrib::UI_DISTRIB_CYLINDER) {
         m_sim = GravSim<num_t>(
             m_n_bodies,
             distrib_cylinder<num_t>{
@@ -185,7 +187,7 @@ class NBodyApp : public ci::app::App {
                 {m_ui_distrib_cylinder_params.min_height,
                  m_ui_distrib_cylinder_params.max_height},
                 sycl::pow(num_t(10), m_ui_distrib_cylinder_params.lg_speed)});
-      } else if (m_ui_distrib_id == UI_DISTRIB_SPHERE) {
+      } else if (m_ui_distrib_id == Distrib::UI_DISTRIB_SPHERE) {
         m_sim = GravSim<num_t>(
             m_n_bodies,
             distrib_sphere<num_t>{{m_ui_distrib_sphere_params.min_radius,
@@ -218,11 +220,11 @@ class NBodyApp : public ci::app::App {
 
     // Update integration method
     switch (m_ui_integrator_id) {
-      case UI_INTEGRATOR_EULER: {
+      case Integrator::UI_INTEGRATOR_EULER: {
         m_sim.set_integrator(integrator_t::EULER);
       } break;
 
-      case UI_INTEGRATOR_RK4: {
+      case Integrator::UI_INTEGRATOR_RK4: {
         m_sim.set_integrator(integrator_t::RK4);
       } break;
 
@@ -317,7 +319,7 @@ class NBodyApp : public ci::app::App {
       ui::SliderInt("Number of bodies", &m_ui_n_bodies, 128, 16384);
 
       switch (m_ui_distrib_id) {
-        case UI_DISTRIB_CYLINDER: {
+        case Distrib::UI_DISTRIB_CYLINDER: {
           if (ui::TreeNode("Cylinder distribution settings")) {
             ui::DragFloatRange2(
                 "Radius", &m_ui_distrib_cylinder_params.min_radius,
@@ -339,7 +341,7 @@ class NBodyApp : public ci::app::App {
           }
         } break;
 
-        case UI_DISTRIB_SPHERE: {
+        case Distrib::UI_DISTRIB_SPHERE: {
           if (ui::TreeNode("Sphere distribution settings")) {
             ui::DragFloatRange2(
                 "Radius", &m_ui_distrib_sphere_params.min_radius,

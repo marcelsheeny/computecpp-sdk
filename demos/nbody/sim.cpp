@@ -27,14 +27,13 @@
 
 #include "sim.hpp"
 
+#ifdef DOUBLE_PRECISION
+using Type = double;
+#else
+using Type = float;
+#endif
+
 template <>
-void GravSim<float>::step() {
+void GravSim<Type>::step() {
   this->internal_step();
 }
-
-/* Doubles disabled.
-template <>
-void GravSim<double>::step() {
-        this->_step();
-}
-*/

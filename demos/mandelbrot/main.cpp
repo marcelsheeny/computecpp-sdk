@@ -38,7 +38,7 @@ namespace sycl = cl::sycl;
 
 #include "mandel.hpp"
 
-// Size of the Window
+// Size of the Window to be created
 constexpr size_t WIDTH = 800u;
 constexpr size_t HEIGHT = 600u;
 

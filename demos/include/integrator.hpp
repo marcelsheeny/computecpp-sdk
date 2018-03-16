@@ -38,8 +38,8 @@
 template <typename time_t, typename func_t, typename... Args>
 std::tuple<Args...> integrate_step_rk4(func_t func, time_t step, Args... vals) {
   static_assert(sizeof...(Args) >= 2,
-                "Do you want infinite loops in your compiler? Because this is "
-                "how you get infinite loops in your compiler.");
+                "Don't initialize with just one value."
+                "It will cause infinite loops in your compiler.");
 
   // preserve the initial values
   auto const init = std::make_tuple(vals...);
@@ -100,8 +100,8 @@ std::tuple<Args...> integrate_step_euler(func_t func, time_t step, Args... vals
                                          // TODO kmem ptr for temporary storage
 ) {
   static_assert(sizeof...(Args) >= 2,
-                "Do you want infinite loops in your compiler? Because this is "
-                "how you get infinite loops in your compiler.");
+                "Don't initialize with just one value."
+                "It will cause infinite loops in your compiler.");
 
   auto const init = std::make_tuple(vals...);
   auto const to_add =

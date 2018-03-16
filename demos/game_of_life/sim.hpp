@@ -30,6 +30,9 @@
 #include <iostream>
 
 #include <CL/sycl.hpp>
+
+#include <sycl_utils.hpp>
+
 namespace sycl = cl::sycl;
 
 #include <double_buf.hpp>
@@ -74,29 +77,7 @@ class GameOfLifeSim {
       : m_width(width),
         m_height(height),
         m_game(width, height),
-        m_q(sycl::default_selector{}, [](sycl::exception_list el) {
-          for (auto e : el) {
-            try {
-              std::rethrow_exception(e);
-            } catch (std::exception const& e) {
-              std::cout << "Caught SYCL exception:\n" << e.what() << std::endl;
-            }
-          }
-        }) {
-    // Initialize game grid to empty
-    auto acells = m_game.read()
-                      .cells.get_access<sycl::access::mode::discard_write,
-                                        sycl::access::target::host_buffer>();
-    auto aimg = m_game.read()
-                    .img.get_access<sycl::access::mode::discard_write,
-                                    sycl::access::target::host_buffer>();
-    for (size_t y = 0; y < m_height; y++) {
-      for (size_t x = 0; x < m_width; x++) {
-        acells[sycl::id<2>(x, y)] = CellState::DEAD;
-        aimg[sycl::id<2>(y, x)] = sycl::cl_uchar4(0, 0, 0, 0);
-      }
-    }
-  }
+        m_q(sycl::default_selector{}, sycl_exception_handler) {}
 
   /// Add a button press (cell spawn) to be processed
   void add_click(size_t x, size_t y, CellState state) {
@@ -109,9 +90,7 @@ class GameOfLifeSim {
   /// Calls the provided function with image data
   template <typename Func>
   void with_img(Func&& func) {
-    auto acc = m_game.read()
-                   .img.get_access<sycl::access::mode::read,
-                                   sycl::access::target::host_buffer>();
+    auto acc = m_game.read().img.get_access<sycl::access::mode::read>();
     func(acc.get_pointer());
   }
 
@@ -126,8 +105,7 @@ class GameOfLifeSim {
       // Have to write into read-buffer rather than write-buffer, since it is
       // the read-buffer
       // that will be read by the kernel.
-      auto acc = this->m_game.read()
-                     .cells.get_access<mode::write, target::host_buffer>();
+      auto acc = this->m_game.read().cells.get_access<mode::write>();
 
       while (!m_clicks.empty()) {
         auto press = m_clicks.back();

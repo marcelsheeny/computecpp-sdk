@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include <CL/sycl.hpp>
+#include <sycl_utils.hpp>
 namespace sycl = cl::sycl;
 
 /* Computes an image representing the Mandelbrot set on the complex
@@ -52,17 +53,7 @@ class MandelbrotCalculator {
   MandelbrotCalculator(size_t width, size_t height)
       : m_width(width),
         m_height(height),
-        m_q(sycl::default_selector{},
-            [&](sycl::exception_list el) {
-              for (auto const& e : el) {
-                try {
-                  std::rethrow_exception(e);
-                } catch (std::exception const& e) {
-                  std::cout << "SYCL exception caught:\n:" << e.what()
-                            << std::endl;
-                }
-              }
-            }),
+        m_q(sycl::default_selector{}, sycl_exception_handler),
         // These are flipped since OpenGL expects column-major order for
         // textures
         m_img(sycl::range<2>(height, width)) {}
@@ -78,8 +69,7 @@ class MandelbrotCalculator {
   // Calls the function with the underlying image memory.
   template <typename Func>
   void with_data(Func&& func) {
-    auto acc = m_img.get_access<sycl::access::mode::read,
-                                sycl::access::target::host_buffer>();
+    auto acc = m_img.get_access<sycl::access::mode::read>();
 
     func(acc.get_pointer());
   }
@@ -96,10 +86,13 @@ class MandelbrotCalculator {
       constexpr num_t DIVERGENCE_LIMIT = (num_t)(256);
       // Calculates how many iterations does it take to diverge? MAX_ITERS if in
       // Mandelbrot set
-      auto how_mandel = [](num_t re, num_t im) -> num_t {
+
+      auto const how_mandel = [](num_t re, num_t im) -> num_t {
         num_t z_re = 0;
         num_t z_im = 0;
         num_t abs_sq = 0;
+
+        const float log_2 = sycl::log(num_t(2));
 
         for (size_t i = 0; i < MAX_ITERS; i++) {
           num_t z_re2 = z_re * z_re - z_im * z_im + re;
@@ -111,8 +104,7 @@ class MandelbrotCalculator {
           // Branching here isn't ideal, but it's the simplest
           if (abs_sq >= DIVERGENCE_LIMIT) {
             num_t log_zn = sycl::log(abs_sq) / num_t(2);
-            num_t nu =
-                sycl::log(log_zn / sycl::log(num_t(2))) / sycl::log(num_t(2));
+            num_t nu = sycl::log(log_zn / log_2) / log_2;
             return num_t(i) + num_t(1) - nu;
           }
         }

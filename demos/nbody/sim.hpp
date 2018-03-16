@@ -31,6 +31,8 @@
 #include <random>
 
 #include <CL/sycl.hpp>
+#include <sycl_utils.hpp>
+
 namespace sycl = cl::sycl;
 
 #include <integrator.hpp>
@@ -46,17 +48,6 @@ using vec3 = sycl::vec<num_t, 3>;
 // Template to generate unique kernel name types
 template <typename T, size_t Z>
 class kernel {};
-
-// Handler for queue exceptions
-const auto except_handler = [](sycl::exception_list el) {
-  for (std::exception_ptr const& e : el) {
-    try {
-      std::rethrow_exception(e);
-    } catch (sycl::exception& e) {
-      std::cout << "EXCEPTION:\n" << e.what() << std::endl;
-    }
-  }
-};
 
 // Initial cylinder distribution parameters
 template <typename num_t>
@@ -120,7 +111,7 @@ class GravSim {
 
   // Base constructor, does not initialize simulation values
   GravSim(size_t n_bodies)
-      : m_q(sycl::default_selector{}, except_handler),
+      : m_q(sycl::default_selector{}, sycl_exception_handler),
         m_bufs(n_bodies),
         m_n_bodies(n_bodies),
         m_time(0),
