@@ -1,4 +1,4 @@
-project (nbody)
+project (sycl_demos)
 
 cmake_minimum_required(VERSION 3.2.2)
 set(CMAKE_VERBOSE_MAKEFILE ON)

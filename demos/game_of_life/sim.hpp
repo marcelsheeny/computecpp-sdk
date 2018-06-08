@@ -133,7 +133,7 @@ class GameOfLifeSim {
             size_t x = item.get(0);
             size_t y = item.get(1);
 
-            // function that process index
+            // lambda that process index
             auto process_index = [](int ind, int offset, int max_size) {
               return (ind + offset) % max_size;
             };

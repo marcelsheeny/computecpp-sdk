@@ -207,8 +207,9 @@ class GravSim {
 
   // Calls the provided function with body position data
   template <typename Func, size_t VarId>
-  void with_mapped(read_bufs_t<VarId>, Func&& func) {
-    auto acc = m_bufs.read().gen_host_read_accs(read_bufs_t<VarId>{});
+  void with_mapped(read_bufs_t<VarId> rb, Func&& func) {
+    // auto acc = m_bufs.read().gen_host_read_accs(read_bufs_t<VarId>{});
+    auto acc = m_bufs.read().gen_host_read_accs(rb);
     func(std::get<0>(acc).get_pointer());
   }
 
