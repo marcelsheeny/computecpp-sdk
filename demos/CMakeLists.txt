@@ -33,4 +33,3 @@ add_definitions(-DDOUBLE_PRECISION=${DOUBLE_PRECISION})
 
 add_subdirectory(game_of_life)
 add_subdirectory(mandelbrot)
-add_subdirectory(nbody)
