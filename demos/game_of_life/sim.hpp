@@ -54,13 +54,11 @@ struct GameGrid {
   GameGrid(size_t width, size_t height)
       : cells(sycl::range<2>(width, height)),
         vels(sycl::range<2>(width, height)),
-
-        // image is flipped since OpenGL expects column-major order
         img(sycl::range<2>(height, width)) {}
 };
 
 class GameOfLifeSim {
-  /// Grid dimensions
+  /// Grid dimensions (image is flipped since OpenGL expects column-major order)
   size_t m_width;
   size_t m_height;
 
