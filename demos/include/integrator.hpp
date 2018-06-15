@@ -38,7 +38,7 @@
 template <typename time_t, typename func_t, typename... Args>
 std::tuple<Args...> integrate_step_rk4(func_t func, time_t step, Args... vals) {
   static_assert(sizeof...(Args) >= 2,
-                "Don't initialize with just one value."
+                "Don't initialize runge-kutta integrator with just one value."
                 "It will cause infinite loops in your compiler.");
 
   // preserve the initial values
@@ -96,11 +96,10 @@ std::tuple<Args...> integrate_step_rk4(func_t func, time_t step, Args... vals) {
  * returns the new values of y(N-1), ..., y1, y, t after the step in a tuple.
  * Uses Euler integration. */
 template <typename time_t, typename func_t, typename... Args>
-std::tuple<Args...> integrate_step_euler(func_t func, time_t step, Args... vals
-                                         // TODO kmem ptr for temporary storage
-) {
+std::tuple<Args...> integrate_step_euler(func_t func, time_t step,
+                                         Args... vals) {
   static_assert(sizeof...(Args) >= 2,
-                "Don't initialize with just one value."
+                "Don't initialize Euler Integration with just one value."
                 "It will cause infinite loops in your compiler.");
 
   auto const init = std::make_tuple(vals...);
